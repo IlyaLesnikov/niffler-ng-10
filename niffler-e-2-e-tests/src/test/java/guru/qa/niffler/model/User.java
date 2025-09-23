@@ -1,4 +1,8 @@
 package guru.qa.niffler.model;
 
-public record User() {
+public record User(
+    String username,
+    String password,
+    String passwordSubmit
+) {
 }
