@@ -18,6 +18,46 @@ public class RegisterTest {
     User user = new User(RandomDataUtil.username(), RandomDataUtil.password(), RandomDataUtil.password());
     Selenide.open(CFG.frontUrl(), LoginPage.class)
         .createNewAccountSubmit()
-        .registerNewUser(user);
+        .registerNewUser(user)
+        .submitSignIn()
+        .login(user.username(), user.password())
+        .shouldStatisticsHeaderVisible()
+        .shouldHistoryOfSpendingsVisible();
+  }
+
+  @Test
+  @DisplayName("Регистрация пользоваталя с невалидным логином")
+  void registeringUserWithInvalidUsernameTest() {
+    User user = new User("aa", RandomDataUtil.password(), RandomDataUtil.password());
+    Selenide.open(CFG.frontUrl(), LoginPage.class)
+        .createNewAccountSubmit()
+        .registerNewUser(user)
+        .submitSignIn()
+        .login(user.username(), user.password())
+        .shouldStatisticsHeaderVisible()
+        .shouldHistoryOfSpendingsVisible();
+  }
+
+  @Test
+  @DisplayName("Регистрация пользоваталя с невалидным паролем")
+  void registeringUserWithInvalidPasswordTest() {
+    User user = new User("aa", RandomDataUtil.password(), RandomDataUtil.password());
+    Selenide.open(CFG.frontUrl(), LoginPage.class)
+        .createNewAccountSubmit()
+        .registerNewUser(user)
+        .submitSignIn()
+        .login(user.username(), user.password())
+        .shouldStatisticsHeaderVisible()
+        .shouldHistoryOfSpendingsVisible();
+  }
+
+  @Test
+  @DisplayName("Регистрация пользоваталя с разными паролями")
+  void registeringUsersWithOtherUsersTest() {
+    User user = new User(RandomDataUtil.username()  , RandomDataUtil.password(), RandomDataUtil.password());
+    Selenide.open(CFG.frontUrl(), LoginPage.class)
+        .createNewAccountSubmit()
+        .registerNewUser(user)
+        .shouldErrorMessageEqualText("Passwords should be equal");
   }
 }
