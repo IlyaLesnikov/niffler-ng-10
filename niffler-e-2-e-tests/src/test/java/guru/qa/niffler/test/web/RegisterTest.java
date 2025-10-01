@@ -15,7 +15,8 @@ public class RegisterTest {
   @Test
   @DisplayName("Регистрация пользователя с валидными данными")
   void shouldRegisterUserWithValidData() {
-    User user = new User(RandomDataUtil.username(), RandomDataUtil.password(), RandomDataUtil.password());
+    String password = RandomDataUtil.password();
+    User user = new User(RandomDataUtil.username(), password, password);
     Selenide.open(CFG.frontUrl(), LoginPage.class)
         .createNewAccountSubmit()
         .registerNewUser(user)
@@ -32,23 +33,17 @@ public class RegisterTest {
     Selenide.open(CFG.frontUrl(), LoginPage.class)
         .createNewAccountSubmit()
         .registerNewUser(user)
-        .submitSignIn()
-        .login(user.username(), user.password())
-        .shouldStatisticsHeaderVisible()
-        .shouldHistoryOfSpendingsVisible();
+        .shouldErrorMessageEqualText("Allowed username length should be from 3 to 50 characters");
   }
 
   @Test
   @DisplayName("Регистрация пользоваталя с невалидным паролем")
   void registeringUserWithInvalidPasswordTest() {
-    User user = new User("aa", RandomDataUtil.password(), RandomDataUtil.password());
+    User user = new User(RandomDataUtil.username(), "aa", "aa");
     Selenide.open(CFG.frontUrl(), LoginPage.class)
         .createNewAccountSubmit()
         .registerNewUser(user)
-        .submitSignIn()
-        .login(user.username(), user.password())
-        .shouldStatisticsHeaderVisible()
-        .shouldHistoryOfSpendingsVisible();
+        .shouldErrorMessageEqualText("Allowed password length should be from 3 to 12 characters");
   }
 
   @Test
@@ -59,5 +54,13 @@ public class RegisterTest {
         .createNewAccountSubmit()
         .registerNewUser(user)
         .shouldErrorMessageEqualText("Passwords should be equal");
+  }
+
+  @Test
+  @DisplayName("Авторизация под несуществующим пользователем")
+  void authorizationUnderNonExistentUser() {
+    Selenide.open(CFG.frontUrl(), LoginPage.class)
+        .login("A", "B");
+    new LoginPage().shouldErrorEqualText("Неверные учетные данные пользователя");
   }
 }

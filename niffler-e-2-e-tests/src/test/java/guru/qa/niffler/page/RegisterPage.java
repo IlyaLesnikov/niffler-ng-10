@@ -2,6 +2,7 @@ package guru.qa.niffler.page;
 
 import com.codeborne.selenide.SelenideElement;
 import guru.qa.niffler.model.User;
+import guru.qa.niffler.page.component.ErrorComponent;
 import guru.qa.niffler.util.WebAssertion;
 
 import static com.codeborne.selenide.Condition.visible;
@@ -9,17 +10,19 @@ import static com.codeborne.selenide.Selenide.$;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RegisterPage {
-
   private final SelenideElement usernameInput = $("#username");
   private final SelenideElement passwordInput = $("#password");
   private final SelenideElement passwordSubmitInput = $("#passwordSubmit");
   private final SelenideElement signUpButton = $("#register-button");
-  private final SelenideElement signIntButton = $("[class*='_sign-in']");
+  private final SelenideElement signInButton = $("[class*='_sign-in']");
   private final SelenideElement errorMessage = $(".form__error");
   private final WebAssertion webAssertion;
+  private final ErrorComponent errorComponent;
+
 
   public RegisterPage() {
     webAssertion = new WebAssertion();
+    errorComponent = new ErrorComponent();
   }
 
   public RegisterPage setUsername(String username) {
@@ -38,7 +41,7 @@ public class RegisterPage {
   }
 
   public RegisterPage submitSignUp() {
-    signIntButton.submit();
+    signUpButton.submit();
     return this;
   }
 
@@ -51,7 +54,7 @@ public class RegisterPage {
   }
 
   public LoginPage submitSignIn() {
-    signIntButton.click();
+    signInButton.click();
     return new LoginPage();
   }
 

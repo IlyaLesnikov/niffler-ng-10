@@ -77,18 +77,18 @@ public class SpendApiClient extends RestClient {
     } catch (IOException exception) {
       throw new RuntimeException("Не удалось выполнить запрос на endpoint %s".formatted(internalCategoriesAdd));
     }
-    assertEquals(HTTP_CREATED, response.code());
+    assertEquals(HTTP_OK, response.code());
     return response.body();
   }
 
   public CategoryJson updateCategory(CategoryJson category) {
     final Response<CategoryJson> response;
     try {
-      response = spendApi.post(category).execute();
+      response = spendApi.patch(category).execute();
     } catch (IOException exception) {
       throw new RuntimeException("Не удалось выполнить запрос на endpoint %s".formatted(internalCategoriesUpdate));
     }
-    assertEquals(HTTP_CREATED, response.code());
+    assertEquals(HTTP_OK, response.code());
     return response.body();
   }
 
