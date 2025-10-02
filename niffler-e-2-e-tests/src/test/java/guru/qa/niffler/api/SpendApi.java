@@ -1,7 +1,6 @@
 package guru.qa.niffler.api;
 
 import guru.qa.niffler.model.CategoryJson;
-import guru.qa.niffler.model.CurrencyJson;
 import guru.qa.niffler.model.SpendJson;
 import retrofit2.Call;
 import retrofit2.http.*;
@@ -18,7 +17,7 @@ public interface SpendApi {
   @GET(internalSpendsId)
   Call<SpendJson> get(@Path("id") int id);
   @GET(internalSpendsAll)
-  Call<List<CurrencyJson>> getSpends();
+  Call<List<SpendJson>> getSpends();
   @DELETE(internalSpendsRemove)
   Call<Void> delete(@Query("ids") int ids);
   @POST(internalCategoriesAdd)

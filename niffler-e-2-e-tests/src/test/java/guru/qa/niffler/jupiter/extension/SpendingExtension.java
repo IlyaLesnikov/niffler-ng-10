@@ -4,15 +4,14 @@ import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.service.SpendApiClient;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
 import java.util.Date;
 
-public class SpendingCallbackExtension implements BeforeEachCallback {
+public class SpendingExtension implements BeforeEachCallback, ParameterResolver {
 
-  public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(SpendingCallbackExtension.class);
+  public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(SpendingExtension.class);
   private final SpendApiClient spendApiClient = new SpendApiClient();
 
   @Override
@@ -43,5 +42,21 @@ public class SpendingCallbackExtension implements BeforeEachCallback {
         annotation.description(),
         annotation.username()
     );
+  }
+
+  @Override
+  public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+    return isSupportsParameter(parameterContext, extensionContext);
+  }
+
+  @Override
+  public SpendJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+    final ExtensionContext.Store store = extensionContext.getStore(NAMESPACE);
+    return store.get(extensionContext.getUniqueId(), SpendJson.class);
+  }
+
+  private Boolean isSupportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+    return parameterContext.getParameter().getType().isAssignableFrom(SpendJson.class) &&
+        extensionContext.getRequiredTestMethod().isAnnotationPresent(Spending.class);
   }
 }
