@@ -1,6 +1,6 @@
 package guru.qa.niffler.config;
 
- enum LocalConfig implements Config {
+enum LocalConfig implements Config {
   INSTANCE;
 
   @Override
@@ -12,4 +12,9 @@ package guru.qa.niffler.config;
   public String spendJdbcUrl() {
    return "jdbc:postgresql://localhost:5432/niffler-spend";
   }
- }
+
+  @Override
+  public String spendApiUrl() {
+   return "http://localhost:8093/";
+  }
+}

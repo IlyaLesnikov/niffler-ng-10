@@ -1,27 +1,10 @@
 package guru.qa.niffler.service.serialization;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.*;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.web.webauthn.api.AttestationConveyancePreference;
-import org.springframework.security.web.webauthn.api.AuthenticationExtensionsClientInputs;
-import org.springframework.security.web.webauthn.api.AuthenticatorAttachment;
-import org.springframework.security.web.webauthn.api.AuthenticatorSelectionCriteria;
-import org.springframework.security.web.webauthn.api.AuthenticatorTransport;
-import org.springframework.security.web.webauthn.api.Bytes;
-import org.springframework.security.web.webauthn.api.COSEAlgorithmIdentifier;
+import org.springframework.security.web.webauthn.api.*;
 import org.springframework.security.web.webauthn.api.CredProtectAuthenticationExtensionsClientInput.CredProtect;
 import org.springframework.security.web.webauthn.api.CredProtectAuthenticationExtensionsClientInput.CredProtect.ProtectionPolicy;
-import org.springframework.security.web.webauthn.api.PublicKeyCredentialDescriptor;
-import org.springframework.security.web.webauthn.api.PublicKeyCredentialParameters;
-import org.springframework.security.web.webauthn.api.PublicKeyCredentialRpEntity;
-import org.springframework.security.web.webauthn.api.PublicKeyCredentialType;
-import org.springframework.security.web.webauthn.api.PublicKeyCredentialUserEntity;
-import org.springframework.security.web.webauthn.api.ResidentKeyRequirement;
-import org.springframework.security.web.webauthn.api.UserVerificationRequirement;
 
 import java.time.Duration;
 import java.util.Collection;

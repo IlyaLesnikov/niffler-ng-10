@@ -13,9 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
-import static guru.qa.niffler.model.CurrencyValues.EUR;
-import static guru.qa.niffler.model.CurrencyValues.RUB;
-import static guru.qa.niffler.model.CurrencyValues.USD;
+import static guru.qa.niffler.model.CurrencyValues.*;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
