@@ -67,8 +67,8 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
   private CategoryJson categoryFromAnnotation(@Nonnull Category annotation) {
     return new CategoryJson(
         null,
-        RandomDataUtil.username(),
-        annotation.name(),
+        RandomDataUtil.name(),
+        annotation.username(),
         false
     );
   }

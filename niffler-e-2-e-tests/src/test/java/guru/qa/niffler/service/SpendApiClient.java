@@ -2,7 +2,6 @@ package guru.qa.niffler.service;
 
 import guru.qa.niffler.api.SpendApi;
 import guru.qa.niffler.model.CategoryJson;
-import guru.qa.niffler.model.CurrencyJson;
 import guru.qa.niffler.model.SpendJson;
 import retrofit2.Response;
 
@@ -50,8 +49,8 @@ public class SpendApiClient extends RestClient {
     return response.body();
   }
 
-  public List<CurrencyJson> getSpends() {
-    final Response<List<CurrencyJson>> response;
+  public List<SpendJson> getSpends() {
+    final Response<List<SpendJson>> response;
     try {
       response = spendApi.getSpends().execute();
     } catch (IOException exception) {

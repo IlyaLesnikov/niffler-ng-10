@@ -9,6 +9,7 @@ import org.junit.platform.commons.support.AnnotationSupport;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class UsersQueueExtension implements BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
@@ -20,14 +21,15 @@ public class UsersQueueExtension implements BeforeEachCallback, AfterEachCallbac
 
   static {
     EMPTY.add(new StaticUser("ilesnikov1", "ilesnikov1", null, null, null));
-    WITH_FRIEND.add(new StaticUser("ilesnikov2", "ilesnikov2", "", null, null));
-    WITH_INCOME_REQUEST.add(new StaticUser("ilesnikov3", "ilesnikov3", null, "", null));
-    WITH_OUTCOME_REQUEST.add(new StaticUser("ilesnikov4", "ilesnikov4", null, null, ""));
+    WITH_FRIEND.add(new StaticUser("ilesnikov3", "ilesnikov3", "ilesnikov2", null, null));
+    WITH_INCOME_REQUEST.add(new StaticUser("ilesnikov2", "ilesnikov2", null, "ilesnikov1", null));
+    WITH_OUTCOME_REQUEST.add(new StaticUser("ilesnikov4", "ilesnikov4", null, null, "ilesnikov3"));
   }
 
   @Override
   public void beforeEach(ExtensionContext context) {
-    Arrays.stream(context.getRequiredTestMethod().getParameters())
+    ExtensionContext.Store store = context.getStore(NAMESPACE);
+    Map<UserType, StaticUser> users = Arrays.stream(context.getRequiredTestMethod().getParameters())
         .filter(parameter -> AnnotationSupport.isAnnotated(parameter, UserType.class))
         .map(parameter -> {
           UserType annotationUserType = parameter.getAnnotation(UserType.class);
@@ -40,8 +42,11 @@ public class UsersQueueExtension implements BeforeEachCallback, AfterEachCallbac
             testResult.setStart(new Date().getTime());
           });
           if (staticUser.isEmpty()) throw new IllegalStateException("Can`t find user after 30 seconds");
-          return staticUser.get();
-        });
+          return Map.of(annotationUserType, staticUser.get()).entrySet();
+        })
+        .flatMap(Collection::stream)
+        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    store.put(context.getUniqueId(), users);
   }
 
   @Override
@@ -51,11 +56,15 @@ public class UsersQueueExtension implements BeforeEachCallback, AfterEachCallbac
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public StaticUser resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-    return null;
+    ExtensionContext.Store store = extensionContext.getStore(NAMESPACE);
+    Map<UserType, StaticUser> users = store.get(extensionContext.getUniqueId(), Map.class);
+    return users.get(parameterContext.getParameter().getAnnotation(UserType.class));
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public void afterEach(ExtensionContext context) {
     ExtensionContext.Store store = context.getStore(NAMESPACE);
     Map<UserType, StaticUser> users = store.get(context.getUniqueId(), Map.class);
