@@ -4,7 +4,7 @@ import com.codeborne.selenide.Selenide;
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.model.User;
 import guru.qa.niffler.page.LoginPage;
-import guru.qa.niffler.util.RandomDataUtil;
+import guru.qa.niffler.util.RandomDataUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,8 +15,8 @@ public class RegisterTest {
   @Test
   @DisplayName("Регистрация пользователя с валидными данными")
   void shouldRegisterUserWithValidData() {
-    String password = RandomDataUtil.password();
-    User user = new User(RandomDataUtil.username(), password, password);
+    String password = RandomDataUtils.password();
+    User user = new User(RandomDataUtils.username(), password, password);
     Selenide.open(CFG.frontUrl(), LoginPage.class)
         .createNewAccountSubmit()
         .registerNewUser(user)
@@ -29,7 +29,7 @@ public class RegisterTest {
   @Test
   @DisplayName("Регистрация пользоваталя с невалидным логином")
   void registeringUserWithInvalidUsernameTest() {
-    User user = new User("aa", RandomDataUtil.password(), RandomDataUtil.password());
+    User user = new User("aa", RandomDataUtils.password(), RandomDataUtils.password());
     Selenide.open(CFG.frontUrl(), LoginPage.class)
         .createNewAccountSubmit()
         .registerNewUser(user)
@@ -39,7 +39,7 @@ public class RegisterTest {
   @Test
   @DisplayName("Регистрация пользоваталя с невалидным паролем")
   void registeringUserWithInvalidPasswordTest() {
-    User user = new User(RandomDataUtil.username(), "aa", "aa");
+    User user = new User(RandomDataUtils.username(), "aa", "aa");
     Selenide.open(CFG.frontUrl(), LoginPage.class)
         .createNewAccountSubmit()
         .registerNewUser(user)
@@ -49,7 +49,7 @@ public class RegisterTest {
   @Test
   @DisplayName("Регистрация пользоваталя с разными паролями")
   void registeringUsersWithOtherUsersTest() {
-    User user = new User(RandomDataUtil.username()  , RandomDataUtil.password(), RandomDataUtil.password());
+    User user = new User(RandomDataUtils.username()  , RandomDataUtils.password(), RandomDataUtils.password());
     Selenide.open(CFG.frontUrl(), LoginPage.class)
         .createNewAccountSubmit()
         .registerNewUser(user)
