@@ -5,6 +5,7 @@ import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.service.SpendApiClient;
+import guru.qa.niffler.util.RandomDataUtils;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
 
@@ -31,7 +32,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
                 new Date(),
                 new CategoryJson(
                     null,
-                    "ilesnikov1",
+                    RandomDataUtils.categoryName(),
                     annotationUser.username(),
                     false
                 ),

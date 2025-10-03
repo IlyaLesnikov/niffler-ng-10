@@ -21,7 +21,7 @@ public class RandomDataUtils {
   }
 
   public static String sentence(int wordsCount) {
-    return faker.name().nameWithMiddle();
+    return faker.commerce().promotionCode(wordsCount);
   }
 
 
