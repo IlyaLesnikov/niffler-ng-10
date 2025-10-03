@@ -41,7 +41,7 @@ public class MainPage {
   }
 
   public MainPage submitIcon() {
-    icon.shouldBe(visible).click();
+    icon.shouldBe(visible, Duration.ofMillis(10_000)).click();
     return this;
   }
 
@@ -49,5 +49,11 @@ public class MainPage {
     SelenideElement element = windowIconElement.find(text(elementText));
     element.click();
     return new ProfilePage();
+  }
+
+  public FriendsPage submitIconOptionFriends() {
+    SelenideElement element = windowIconElement.find(text("Friends"));
+    element.shouldBe(visible).click();
+    return new FriendsPage();
   }
 }

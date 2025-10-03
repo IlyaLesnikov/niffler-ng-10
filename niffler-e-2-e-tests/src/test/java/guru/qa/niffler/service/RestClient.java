@@ -15,7 +15,7 @@ abstract class RestClient {
       .build();
   protected final Retrofit retrofit = new Retrofit.Builder()
       .client(okHttpClient)
-      .baseUrl(CFG.spendApiUrl())
+      .baseUrl(CFG.spendUrl())
       .addConverterFactory(JacksonConverterFactory.create())
       .build();
 }
