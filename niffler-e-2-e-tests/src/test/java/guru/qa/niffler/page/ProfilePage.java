@@ -31,7 +31,7 @@ public class ProfilePage {
   }
 
   public ProfilePage submitShowArchive() {
-    showArchivedButton.click();
+    showArchivedButton.scrollIntoCenter().click();
     return this;
   }
 
