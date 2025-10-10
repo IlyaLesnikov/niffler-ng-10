@@ -1,6 +1,10 @@
 package guru.qa.niffler.data;
 
 import guru.qa.niffler.model.TransactionIsolation;
+import guru.qa.niffler.model.XaFunction;
+import jakarta.transaction.NotSupportedException;
+import jakarta.transaction.SystemException;
+import jakarta.transaction.UserTransaction;
 import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;
@@ -18,9 +22,26 @@ public class Databases {
   private static final Map<String, DataSource> datasource = new ConcurrentHashMap<>();
   private static final Map<Long, Map<String, Connection>> threadConnections = new ConcurrentHashMap<>();
 
-  public static <T> T xaTransaction() {
-
-  }
+  /*public static <T> T xaTransaction(XaFunction<T>... actions) {
+    UserTransaction userTransaction;
+    try {
+      userTransaction.begin();
+      T result;
+      for (XaFunction<T> action: actions) {
+        Connection connection = connection(action.jdbcUrl());
+        result = action.function(connection);
+      }
+      userTransaction.commit();
+      return result;
+    } catch (SystemException e) {
+      try {
+        userTransaction.rollback();
+      } catch (SystemException ex) {
+        throw new RuntimeException(ex);
+      }
+      throw new RuntimeException(e);
+    }
+  }*/
 
   public static void xaTransaction() {
 
