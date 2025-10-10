@@ -24,7 +24,6 @@ public class RandomDataUtils {
     return faker.commerce().promotionCode(wordsCount);
   }
 
-
   public static String password() {
     return faker.internet().password();
   }
