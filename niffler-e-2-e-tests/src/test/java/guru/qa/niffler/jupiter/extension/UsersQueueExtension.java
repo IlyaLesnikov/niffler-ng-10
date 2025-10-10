@@ -1,6 +1,7 @@
 package guru.qa.niffler.jupiter.extension;
 
 import guru.qa.niffler.jupiter.annotation.UserType;
+import guru.qa.niffler.model.StaticUser;
 import io.qameta.allure.Allure;
 import org.apache.commons.lang3.time.StopWatch;
 import org.junit.jupiter.api.extension.*;
@@ -36,7 +37,9 @@ public class UsersQueueExtension implements BeforeEachCallback, AfterEachCallbac
           Optional<StaticUser> staticUser = Optional.empty();
           StopWatch stopWatch = StopWatch.createStarted();
           while (staticUser.isEmpty() && stopWatch.getTime(TimeUnit.SECONDS) < 30) {
-            staticUser = Optional.ofNullable(pollStaticUser(annotationUserType.type()));
+            staticUser = Optional.ofNullable(
+                getQueueByUserType(annotationUserType.type()).poll()
+            );
           }
           Allure.getLifecycle().updateTestCase(testResult -> {
             testResult.setStart(new Date().getTime());
@@ -69,33 +72,16 @@ public class UsersQueueExtension implements BeforeEachCallback, AfterEachCallbac
     ExtensionContext.Store store = context.getStore(NAMESPACE);
     Map<UserType, StaticUser> users = store.get(context.getUniqueId(), Map.class);
     for (Map.Entry<UserType, StaticUser> user: users.entrySet()) {
-      peekStaticUser(user.getKey().type(), user.getValue());
+      getQueueByUserType(user.getKey().type()).add(user.getValue());
     }
   }
 
-  public record StaticUser(
-      String username,
-      String password,
-      String friend,
-      String income,
-      String outcome
-  ) {}
-
-  private StaticUser pollStaticUser(UserType.Type type) {
+  private Queue<StaticUser> getQueueByUserType(UserType.Type type) {
     return switch (type) {
-      case EMPTY -> EMPTY.poll();
-      case WITH_FRIEND -> WITH_FRIEND.poll();
-      case WITH_INCOME_REQUEST -> WITH_INCOME_REQUEST.poll();
-      case WITH_OUTCOME_REQUEST -> WITH_OUTCOME_REQUEST.poll();
+      case EMPTY -> EMPTY;
+      case WITH_FRIEND -> WITH_FRIEND;
+      case WITH_INCOME_REQUEST -> WITH_INCOME_REQUEST;
+      case WITH_OUTCOME_REQUEST -> WITH_OUTCOME_REQUEST;
     };
-  }
-
-  private void peekStaticUser(UserType.Type type, StaticUser staticUser) {
-    switch (type) {
-      case EMPTY -> EMPTY.add(staticUser);
-      case WITH_FRIEND -> WITH_FRIEND.add(staticUser);
-      case WITH_INCOME_REQUEST -> WITH_INCOME_REQUEST.add(staticUser);
-      case WITH_OUTCOME_REQUEST -> WITH_OUTCOME_REQUEST.add(staticUser);
-    }
   }
 }
