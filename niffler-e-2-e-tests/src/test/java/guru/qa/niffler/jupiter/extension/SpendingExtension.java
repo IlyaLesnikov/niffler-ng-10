@@ -46,17 +46,13 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
 
   @Override
   public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-    return isSupportsParameter(parameterContext, extensionContext);
+    return parameterContext.getParameter().getType().isAssignableFrom(SpendJson.class) &&
+        extensionContext.getRequiredTestMethod().isAnnotationPresent(Spending.class);
   }
 
   @Override
   public SpendJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
     final ExtensionContext.Store store = extensionContext.getStore(NAMESPACE);
     return store.get(extensionContext.getUniqueId(), SpendJson.class);
-  }
-
-  private Boolean isSupportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
-    return parameterContext.getParameter().getType().isAssignableFrom(SpendJson.class) &&
-        extensionContext.getRequiredTestMethod().isAnnotationPresent(Spending.class);
   }
 }
