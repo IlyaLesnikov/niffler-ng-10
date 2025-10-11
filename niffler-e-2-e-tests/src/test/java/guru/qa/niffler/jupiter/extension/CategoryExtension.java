@@ -3,7 +3,8 @@ package guru.qa.niffler.jupiter.extension;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
-import guru.qa.niffler.service.SpendApiClient;
+import guru.qa.niffler.service.SpendClient;
+import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.util.RandomDataUtils;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
@@ -11,7 +12,7 @@ import org.junit.platform.commons.support.AnnotationSupport;
 public class CategoryExtension implements BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
 
   public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
-  private final SpendApiClient spendApi = new SpendApiClient();
+  private final SpendClient spendClient = new SpendDbClient();
 
   @Override
   public void beforeEach(ExtensionContext context) {
@@ -27,9 +28,9 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                 annotationUser.username(),
                 false
             );
-            CategoryJson categoryCreated = spendApi.createCategory(category);
+            CategoryJson categoryCreated = spendClient.createCategory(category);
             if (annotationCategory.archived()) {
-              categoryCreated = spendApi.updateCategory(
+              categoryCreated = spendClient.updateCategory(
                   new CategoryJson(
                       categoryCreated.id(),
                       categoryCreated.name(),
@@ -62,7 +63,7 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
           ExtensionContext.Store store = context.getStore(NAMESPACE);
           CategoryJson category =  store.get(context.getUniqueId(), CategoryJson.class);
           if (category != null && !category.archived()) {
-            spendApi.updateCategory(
+            spendClient.updateCategory(
                 new CategoryJson(
                     category.id(),
                     category.name(),
