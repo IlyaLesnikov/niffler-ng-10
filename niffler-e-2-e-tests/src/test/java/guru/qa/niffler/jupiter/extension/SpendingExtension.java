@@ -4,7 +4,7 @@ import guru.qa.niffler.jupiter.annotation.Spending;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
-import guru.qa.niffler.service.SpendApiClient;
+import guru.qa.niffler.service.SpendDbClient;
 import guru.qa.niffler.util.RandomDataUtils;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
@@ -14,7 +14,7 @@ import java.util.Date;
 public class SpendingExtension implements BeforeEachCallback, ParameterResolver {
 
   public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(SpendingExtension.class);
-  private final SpendApiClient spendApiClient = new SpendApiClient();
+  private final SpendDbClient spendDbClient = new SpendDbClient();
 
   @Override
   public void beforeEach(ExtensionContext context) {
@@ -41,7 +41,7 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
                 annotationSpending.description(),
                 annotationUser.username()
             );
-            SpendJson createdSpend = spendApiClient.createSpend(spend);
+            SpendJson createdSpend = spendDbClient.create(spend);
             store.put(context.getUniqueId(), createdSpend);
           }
         });
@@ -49,17 +49,13 @@ public class SpendingExtension implements BeforeEachCallback, ParameterResolver 
 
   @Override
   public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-    return isSupportsParameter(parameterContext, extensionContext);
+    return parameterContext.getParameter().getType().isAssignableFrom(SpendJson.class) &&
+        extensionContext.getRequiredTestMethod().isAnnotationPresent(Spending.class);
   }
 
   @Override
   public SpendJson resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
     final ExtensionContext.Store store = extensionContext.getStore(NAMESPACE);
     return store.get(extensionContext.getUniqueId(), SpendJson.class);
-  }
-
-  private Boolean isSupportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
-    return parameterContext.getParameter().getType().isAssignableFrom(SpendJson.class) &&
-        extensionContext.getRequiredTestMethod().isAnnotationPresent(User.class);
   }
 }
