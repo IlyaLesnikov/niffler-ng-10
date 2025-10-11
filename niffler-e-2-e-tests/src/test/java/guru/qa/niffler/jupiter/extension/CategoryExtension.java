@@ -27,9 +27,9 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                 annotationUser.username(),
                 false
             );
-            CategoryJson categoryCreated = spendDbClient.create(category);
+            CategoryJson categoryCreated = spendDbClient.createCategory(category);
             if (annotationCategory.archived()) {
-              categoryCreated = spendDbClient.update(
+              categoryCreated = spendDbClient.updateCategory(
                   new CategoryJson(
                       categoryCreated.id(),
                       categoryCreated.name(),
@@ -61,6 +61,8 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
         .ifPresent(annotationUser -> {
           ExtensionContext.Store store = context.getStore(NAMESPACE);
           CategoryJson category =  store.get(context.getUniqueId(), CategoryJson.class);
+          if (category != null) {
+            spendDbClient.updateCategory(
           if (category != null && !category.archived()) {
             spendApi.updateCategory(
                 new CategoryJson(
