@@ -53,13 +53,17 @@ public class SpendDaoJdbc implements SpendDao {
         preparedStatement.execute();
         try (ResultSet resultSet = preparedStatement.getResultSet()) {
           if (resultSet.next()) {
+            CategoryEntity categoryEntity = new CategoryEntity();
+            categoryEntity.setId(resultSet.getObject("category_id", UUID.class));
             SpendEntity spendEntity = new SpendEntity();
             spendEntity.setUsername(resultSet.getString("username"));
-            spendEntity.setCurrency(resultSet.getObject("username", CurrencyValues.class));
+            spendEntity.setCurrency(
+                CurrencyValues.valueOf(resultSet.getString("currency"))
+            );
             spendEntity.setSpendDate(resultSet.getDate("spendDate"));
             spendEntity.setAmount(resultSet.getDouble("amount"));
             spendEntity.setDescription(resultSet.getString("username"));
-            spendEntity.setCategory(resultSet.getObject("category", CategoryEntity.class));
+            spendEntity.setCategory(categoryEntity);
             return Optional.of(spendEntity);
           } else {
             return Optional.empty();
@@ -82,13 +86,15 @@ public class SpendDaoJdbc implements SpendDao {
         try (ResultSet resultSet = preparedStatement.getResultSet()) {
           List<SpendEntity> spendEntities = new ArrayList<>();
           while (resultSet.next()) {
+            CategoryEntity categoryEntity = new CategoryEntity();
+            categoryEntity.setId(resultSet.getObject("category_id", UUID.class));
             SpendEntity spendEntity = new SpendEntity();
             spendEntity.setUsername(resultSet.getString("username"));
-            spendEntity.setCurrency(resultSet.getObject("username", CurrencyValues.class));
-            spendEntity.setSpendDate(resultSet.getDate("spendDate"));
+            spendEntity.setCurrency(CurrencyValues.valueOf(resultSet.getString("username")));
+            spendEntity.setSpendDate(resultSet.getDate("spend_date"));
             spendEntity.setAmount(resultSet.getDouble("amount"));
             spendEntity.setDescription(resultSet.getString("username"));
-            spendEntity.setCategory(resultSet.getObject("category", CategoryEntity.class));
+            spendEntity.setCategory(categoryEntity);
             spendEntities.add(spendEntity);
           }
           return spendEntities;

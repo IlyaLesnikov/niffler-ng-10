@@ -151,7 +151,7 @@ public class CategoryDaoJdbc implements CategoryDao {
         preparedStatement.setObject(1, categoryEntity.getId());
         int numberEntitiesRemoved = preparedStatement.executeUpdate();
         if (numberEntitiesRemoved != 1) {
-          throw new SQLException("Не удалось удалить трату с id = %s из таблицы category".formatted(categoryEntity.getId()));
+          throw new SQLException("Не удалось удалить категорию с id = %s из таблицы category".formatted(categoryEntity.getId()));
         }
       }
     } catch (SQLException e) {
