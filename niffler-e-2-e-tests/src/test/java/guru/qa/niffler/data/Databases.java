@@ -1,20 +1,24 @@
 package guru.qa.niffler.data;
 
+import com.atomikos.icatch.jta.UserTransactionImp;
+import com.atomikos.jdbc.AtomikosDataSourceBean;
 import guru.qa.niffler.model.TransactionIsolation;
+import guru.qa.niffler.model.XaConsumer;
 import guru.qa.niffler.model.XaFunction;
-import jakarta.transaction.NotSupportedException;
 import jakarta.transaction.SystemException;
 import jakarta.transaction.UserTransaction;
-import org.postgresql.ds.PGSimpleDataSource;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import static org.apache.commons.lang3.StringUtils.substringAfter;
 
 public class Databases {
   private Databases() {}
@@ -22,18 +26,19 @@ public class Databases {
   private static final Map<String, DataSource> datasource = new ConcurrentHashMap<>();
   private static final Map<Long, Map<String, Connection>> threadConnections = new ConcurrentHashMap<>();
 
-  /*public static <T> T xaTransaction(XaFunction<T>... actions) {
-    UserTransaction userTransaction;
+  public static <T> T xaTransaction(TransactionIsolation transactionIsolation, XaFunction<T>... actions) {
+    UserTransaction userTransaction = new UserTransactionImp();
     try {
       userTransaction.begin();
-      T result;
+      T result = null;
       for (XaFunction<T> action: actions) {
         Connection connection = connection(action.jdbcUrl());
-        result = action.function(connection);
+        connection.setTransactionIsolation(transactionIsolation.level());
+        result = action.function().apply(connection);
       }
       userTransaction.commit();
       return result;
-    } catch (SystemException e) {
+    } catch (Exception e) {
       try {
         userTransaction.rollback();
       } catch (SystemException ex) {
@@ -41,10 +46,26 @@ public class Databases {
       }
       throw new RuntimeException(e);
     }
-  }*/
+  }
 
-  public static void xaTransaction() {
-
+  public static void xaTransaction(TransactionIsolation transactionIsolation, XaConsumer... actions) {
+    UserTransaction userTransaction = new UserTransactionImp();
+    try {
+      userTransaction.begin();
+      for (XaConsumer action: actions) {
+        Connection connection = connection(action.jdbcUrl());
+        connection.setTransactionIsolation(transactionIsolation.level());
+        action.consumer().accept(connection);
+      }
+      userTransaction.commit();
+    } catch (Exception e) {
+      try {
+        userTransaction.rollback();
+      } catch (SystemException ex) {
+        throw new RuntimeException(ex);
+      }
+      throw new RuntimeException(e);
+    }
   }
 
   public static <T> T transaction(Function<Connection, T> function, String jdbcUrl, TransactionIsolation transactionIsolation) {
@@ -120,11 +141,16 @@ public class Databases {
     return datasource.computeIfAbsent(
         jdbcUrl,
         key -> {
-          PGSimpleDataSource dataSource = new PGSimpleDataSource();
-          dataSource.setUrl(jdbcUrl);
-          dataSource.setUser("postgres");
-          dataSource.setPassword("secret");
-          return dataSource;
+          AtomikosDataSourceBean xaDatasource = new AtomikosDataSourceBean();
+          final String uniqueId = substringAfter(jdbcUrl, "5432/");
+          xaDatasource.setUniqueResourceName(uniqueId);
+          xaDatasource.setXaDataSourceClassName("org.postgresql.xa.PGXADataSource");
+          Properties properties = new Properties();
+          properties.setProperty("URL", jdbcUrl);
+          properties.setProperty("user", "postgres");
+          properties.setProperty("password", "secret");
+          xaDatasource.setXaProperties(properties);
+          return xaDatasource;
         }
     );
   }

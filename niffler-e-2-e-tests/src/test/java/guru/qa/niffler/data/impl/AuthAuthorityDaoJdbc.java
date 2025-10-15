@@ -16,14 +16,17 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
   }
 
   @Override
-  public AuthorityEntity create(AuthorityEntity authorityEntity) {
+  public AuthorityEntity create(AuthorityEntity... authorityEntities) {
     try (PreparedStatement preparedStatement = connection.prepareStatement(
         "INSERT INTO authority (user_id, authority) VALUES (?, ?)",
         Statement.RETURN_GENERATED_KEYS
     )) {
-      preparedStatement.setObject(1, authorityEntity.getAuthority());
-      preparedStatement.setObject(2, authorityEntity.getUser().getId());
-      preparedStatement.executeUpdate();
+      for (AuthorityEntity authorityEntity: authorityEntities) {
+        preparedStatement.setObject(1, authorityEntity.getUser().getId());
+        preparedStatement.setObject(2, authorityEntity.getAuthority());
+        preparedStatement.addBatch();
+      }
+      preparedStatement.executeBatch();
       final UUID generatedKey;
       try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
         if (resultSet.next()) {
@@ -32,8 +35,8 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
           throw new SQLException("Не удалось создать запись");
         }
       }
-      authorityEntity.setId(generatedKey);
-      return authorityEntity;
+      authorityEntities[0].setId(generatedKey);
+      return authorityEntities[0];
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
@@ -50,7 +53,7 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
         if (resultSet.next()) {
           AuthorityEntity authorityEntity = new AuthorityEntity();
           authorityEntity.setId(resultSet.getObject("id", UUID.class));
-          authorityEntity.setAuthority(resultSet.getObject("authority", Authority.class));
+          authorityEntity.setAuthority(Authority.valueOf(resultSet.getString("authority")));
           authorityEntity.setId(resultSet.getObject("user_id", UUID.class));
           return Optional.of(authorityEntity);
         } else {
@@ -69,7 +72,7 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
     )) {
       preparedStatement.setObject(1, authorityEntity.getId());
       int numberEntitiesRemoved = preparedStatement.executeUpdate();
-      if (numberEntitiesRemoved != 1) throw new SQLException("Не удалось удалить трату с id = %s из таблицы authority".formatted(authorityEntity.getId()));
+      if (numberEntitiesRemoved != 1) throw new SQLException("Не удалось удалить авторизацию с id = %s из таблицы authority".formatted(authorityEntity.getId()));
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }

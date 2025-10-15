@@ -9,8 +9,8 @@ import java.util.UUID;
 @Setter
 public class AuthorityEntity {
   private UUID id;
+  private AuthUserEntity user;
   private Authority authority;
-  private UserEntity user;
 
   public static AuthorityEntity fromJson() {
     AuthorityEntity authorityEntity = new AuthorityEntity();
