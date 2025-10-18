@@ -20,8 +20,10 @@ public class ProfilePage {
   }
 
   public ProfilePage submitUnarchiveCategory(String categoryName) {
-    String locator = "//span[text()='%s']/../..//button[@aria-label='Unarchive category']".formatted(categoryName);
-    $(xpath(locator)).click();
+    String locator = "//span[text()='%s']/../..//button[@aria-label='Unarchive category']/..".formatted(categoryName);
+    $(xpath(locator)).scrollTo()
+        .shouldBe(visible)
+        .click();
     return this;
   }
 
@@ -31,7 +33,7 @@ public class ProfilePage {
   }
 
   public ProfilePage submitShowArchive() {
-    showArchivedButton.click();
+    showArchivedButton.scrollIntoCenter().click();
     return this;
   }
 
