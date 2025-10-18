@@ -1,25 +1,21 @@
 package guru.qa.niffler.service;
 
-import guru.qa.niffler.data.dao.UserDataDao;
+import guru.qa.niffler.config.Config;
+import guru.qa.niffler.data.Databases;
+import guru.qa.niffler.data.entity.AuthUserEntity;
+import guru.qa.niffler.data.entity.Authority;
+import guru.qa.niffler.data.entity.AuthorityEntity;
 import guru.qa.niffler.data.entity.UserEntity;
+import guru.qa.niffler.data.impl.AuthAuthorityDaoJdbc;
+import guru.qa.niffler.data.impl.AuthUserDaoJdbc;
 import guru.qa.niffler.data.impl.UserDataDaoJdbc;
-import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.model.*;
 
-public class UserDataDbClient {
-  private final UserDataDao userDataDao = new UserDataDaoJdbc();
+import java.util.List;
 
-  public UserJson create(UserJson userJson) {
-    UserEntity userEntity = UserEntity.fromJson(userJson);
-    UserEntity createdUserEntity = userDataDao.create(userEntity);
-    return UserJson.fromEntity(createdUserEntity);
-  }
-
-  public void delete(UserJson userJson) {
-    UserEntity userEntity = UserEntity.fromJson(userJson);
-    userDataDao.delete(userEntity);
-  }
 public class UserDbClient {
-  private static final Config CONFIG = Config.getInstance();
+  
+  private final Config CONFIG = Config.getInstance();
 
   public Object createUser(UserJson userJson, AuthUserJson authUserJson, TransactionIsolation transactionIsolation) {
     return Databases.xaTransaction(

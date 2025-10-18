@@ -3,7 +3,7 @@ package guru.qa.niffler.jupiter.extension;
 import guru.qa.niffler.jupiter.annotation.Category;
 import guru.qa.niffler.jupiter.annotation.User;
 import guru.qa.niffler.model.CategoryJson;
-import guru.qa.niffler.service.SpendDbClient;
+import guru.qa.niffler.service.SpendApiClient;
 import guru.qa.niffler.util.RandomDataUtils;
 import org.junit.jupiter.api.extension.*;
 import org.junit.platform.commons.support.AnnotationSupport;
@@ -11,7 +11,7 @@ import org.junit.platform.commons.support.AnnotationSupport;
 public class CategoryExtension implements BeforeEachCallback, AfterTestExecutionCallback, ParameterResolver {
 
   public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(CategoryExtension.class);
-  private final SpendDbClient spendDbClient = new SpendDbClient();
+  private final SpendApiClient spendApi = new SpendApiClient();
 
   @Override
   public void beforeEach(ExtensionContext context) {
@@ -27,9 +27,9 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
                 annotationUser.username(),
                 false
             );
-            CategoryJson categoryCreated = spendDbClient.create(category);
+            CategoryJson categoryCreated = spendApi.createCategory(category);
             if (annotationCategory.archived()) {
-              categoryCreated = spendDbClient.update(
+              categoryCreated = spendApi.updateCategory(
                   new CategoryJson(
                       categoryCreated.id(),
                       categoryCreated.name(),
@@ -61,8 +61,6 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
         .ifPresent(annotationUser -> {
           ExtensionContext.Store store = context.getStore(NAMESPACE);
           CategoryJson category =  store.get(context.getUniqueId(), CategoryJson.class);
-          if (category != null) {
-            spendDbClient.update(
           if (category != null && !category.archived()) {
             spendApi.updateCategory(
                 new CategoryJson(
