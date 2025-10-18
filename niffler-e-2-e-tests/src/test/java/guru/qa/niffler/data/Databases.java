@@ -53,7 +53,7 @@ public class Databases {
 
   private static final Map<String, DataSource> datasource = new ConcurrentHashMap<>();
   private static final Map<Long, Map<String, Connection>> threadConnections = new ConcurrentHashMap<>();
-
+  
   public static <T> T xaTransaction(TransactionIsolation transactionIsolation, XaFunction<T>... actions) {
     UserTransaction userTransaction = new UserTransactionImp();
     try {

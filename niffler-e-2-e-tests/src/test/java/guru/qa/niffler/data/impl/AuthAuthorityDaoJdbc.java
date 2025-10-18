@@ -5,6 +5,8 @@ import guru.qa.niffler.data.entity.Authority;
 import guru.qa.niffler.data.entity.AuthorityEntity;
 
 import java.sql.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,27 +18,25 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
   }
 
   @Override
-  public AuthorityEntity create(AuthorityEntity... authorityEntities) {
+  public List<AuthorityEntity> create(AuthorityEntity... authorityEntities) {
     try (PreparedStatement preparedStatement = connection.prepareStatement(
         "INSERT INTO authority (user_id, authority) VALUES (?, ?)",
         Statement.RETURN_GENERATED_KEYS
     )) {
       for (AuthorityEntity authorityEntity: authorityEntities) {
         preparedStatement.setObject(1, authorityEntity.getUser().getId());
-        preparedStatement.setObject(2, authorityEntity.getAuthority());
+        preparedStatement.setString(2, authorityEntity.getAuthority().name());
         preparedStatement.addBatch();
+        preparedStatement.clearParameters();
       }
       preparedStatement.executeBatch();
-      final UUID generatedKey;
       try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
-        if (resultSet.next()) {
-          generatedKey = resultSet.getObject("id", UUID.class);
-        } else {
-          throw new SQLException("Не удалось создать запись");
+        for (int index = 0; resultSet.next(); index++) {
+          final UUID generatedKeys = resultSet.getObject("id", UUID.class);
+          authorityEntities[index].setId(generatedKeys);
         }
       }
-      authorityEntities[0].setId(generatedKey);
-      return authorityEntities[0];
+      return Arrays.stream(authorityEntities).toList();
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }

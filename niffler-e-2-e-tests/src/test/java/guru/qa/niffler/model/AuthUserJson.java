@@ -17,7 +17,7 @@ public record AuthUserJson(
     List<AuthorityEntity> authorities
 ) {
 
-  public static AuthUserJson fromJson(AuthUserEntity authUserJson) {
+  public static AuthUserJson fromEntity(AuthUserEntity authUserJson) {
     return new AuthUserJson(
         authUserJson.getId(),
         authUserJson.getUsername(),

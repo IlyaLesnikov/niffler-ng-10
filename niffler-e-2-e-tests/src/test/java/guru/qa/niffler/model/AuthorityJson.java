@@ -1,4 +1,22 @@
 package guru.qa.niffler.model;
 
-public record AuthorityJson() {
+import guru.qa.niffler.data.entity.Authority;
+import guru.qa.niffler.data.entity.AuthorityEntity;
+
+import java.util.UUID;
+
+public record AuthorityJson(
+    UUID id,
+    AuthUserJson user,
+    Authority authority
+) {
+  public static AuthorityJson fromEntity(AuthorityEntity authorityEntity) {
+    return new AuthorityJson(
+        authorityEntity.getId(),
+        AuthUserJson.fromEntity(
+            authorityEntity.getUser()
+        ),
+        authorityEntity.getAuthority()
+    );
+  }
 }
