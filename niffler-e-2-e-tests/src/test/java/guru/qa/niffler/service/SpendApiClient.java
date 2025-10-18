@@ -12,7 +12,7 @@ import static guru.qa.niffler.api.Endpoint.*;
 import static java.net.HttpURLConnection.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SpendApiClient extends RestClient {
+public class SpendApiClient extends RestClient implements SpendClient {
 
   private final SpendApi spendApi = retrofit.create(SpendApi.class);
 
@@ -27,7 +27,7 @@ public class SpendApiClient extends RestClient {
     return response.body();
   }
 
-  public SpendJson editSpend(SpendJson spend) {
+  public SpendJson updateSpend(SpendJson spend) {
     final Response<SpendJson> response;
     try {
       response = spendApi.patch(spend).execute();
