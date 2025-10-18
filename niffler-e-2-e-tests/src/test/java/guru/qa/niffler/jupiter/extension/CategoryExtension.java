@@ -18,11 +18,8 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
     AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
         .ifPresent(annotationUser -> {
           Category[] annotationCategories = annotationUser.categories();
-          Category annotationCategory = null;
           if (annotationCategories.length != 0) {
-            annotationCategory = annotationCategories[0];
-          }
-          if (annotationCategory != null) {
+            Category annotationCategory = annotationCategories[0];
             ExtensionContext.Store store = context.getStore(NAMESPACE);
             CategoryJson category = new CategoryJson(
                 null,
@@ -66,6 +63,8 @@ public class CategoryExtension implements BeforeEachCallback, AfterTestExecution
           CategoryJson category =  store.get(context.getUniqueId(), CategoryJson.class);
           if (category != null) {
             spendDbClient.update(
+          if (category != null && !category.archived()) {
+            spendApi.updateCategory(
                 new CategoryJson(
                     category.id(),
                     category.name(),
