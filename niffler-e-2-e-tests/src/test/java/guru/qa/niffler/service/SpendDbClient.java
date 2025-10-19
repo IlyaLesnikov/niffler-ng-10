@@ -26,6 +26,7 @@ public class SpendDbClient implements SpendClient {
       CategoryEntity categoryEntity = categoryDao.create(spendEntity.getCategory());
       spendEntity.setCategory(categoryEntity);
     }
+
     return SpendJson.fromEntity(spendDao.create(spendEntity));
   }
 
