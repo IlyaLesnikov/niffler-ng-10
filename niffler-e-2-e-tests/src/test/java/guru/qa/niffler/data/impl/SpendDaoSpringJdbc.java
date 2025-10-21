@@ -3,7 +3,6 @@ package guru.qa.niffler.data.impl;
 import guru.qa.niffler.data.dao.SpendDao;
 import guru.qa.niffler.data.entity.SpendEntity;
 import guru.qa.niffler.data.mapper.SpendRowMapper;
-import guru.qa.niffler.data.mapper.SpendsRowMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -65,9 +64,10 @@ public class SpendDaoSpringJdbc implements SpendDao {
   @Override
   public List<SpendEntity> findAllByUsername(String username) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-    return jdbcTemplate.queryForObject(
+    return jdbcTemplate.query(
         "SELECT * FROM spend WHERE username = ?",
-        SpendsRowMapper.INSTANCE
+        SpendRowMapper.INSTANCE,
+        username
     );
   }
 

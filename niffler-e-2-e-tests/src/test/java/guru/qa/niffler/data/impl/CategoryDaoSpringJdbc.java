@@ -2,7 +2,6 @@ package guru.qa.niffler.data.impl;
 
 import guru.qa.niffler.data.dao.CategoryDao;
 import guru.qa.niffler.data.entity.CategoryEntity;
-import guru.qa.niffler.data.mapper.CategoriesRowMapper;
 import guru.qa.niffler.data.mapper.CategoryRowMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -71,9 +70,9 @@ public class CategoryDaoSpringJdbc implements CategoryDao {
   @Override
   public List<CategoryEntity> findAllByUsername(String username) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate();
-    return jdbcTemplate.queryForObject(
+    return jdbcTemplate.query(
         "SELECT * FROM category WHERE username = ?",
-        CategoriesRowMapper.INSTANCE,
+        CategoryRowMapper.INSTANCE,
         username
     );
   }
@@ -81,7 +80,12 @@ public class CategoryDaoSpringJdbc implements CategoryDao {
   @Override
   public CategoryEntity update(CategoryEntity categoryEntity) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-    jdbcTemplate.update("UPDATE category SET archived = ? WHERE id = ?");
+    jdbcTemplate.update(
+        "UPDATE category SET name = ?, username = ?, archived = ? WHERE id = ?",
+        categoryEntity.getName(),
+        categoryEntity.getUsername(),
+        categoryEntity.isArchived()
+    );
     log.info("Updated the entity with id = %s in the category table".formatted(categoryEntity.getId()));
     return categoryEntity;
   }
