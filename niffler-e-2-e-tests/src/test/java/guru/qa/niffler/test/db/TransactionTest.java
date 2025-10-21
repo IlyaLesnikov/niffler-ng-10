@@ -23,18 +23,7 @@ public class TransactionTest {
             RandomDataUtils.currencyValues(),
             "",
             "df"
-        ),
-        new AuthUserJson(
-            null,
-            RandomDataUtils.username(),
-            RandomDataUtils.password(),
-            true,
-            true,
-            true,
-            true,
-            List.of()
-        ),
-        TransactionIsolation.TRANSACTION_READ_UNCOMMITTED
+        )
     );
   }
 
@@ -50,18 +39,7 @@ public class TransactionTest {
             RandomDataUtils.currencyValues(),
             "",
             ""
-        ),
-        new AuthUserJson(
-            null,
-            null,
-            RandomDataUtils.password(),
-            true,
-            true,
-            true,
-            true,
-            List.of()
-        ),
-        TransactionIsolation.TRANSACTION_READ_UNCOMMITTED
+        )
     );
   }
 }

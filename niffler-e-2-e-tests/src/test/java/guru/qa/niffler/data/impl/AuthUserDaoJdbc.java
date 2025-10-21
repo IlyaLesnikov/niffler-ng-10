@@ -48,7 +48,7 @@ public class AuthUserDaoJdbc implements AuthUserDao {
   @Override
   public Optional<AuthUserEntity> findById(UUID id) {
     try (PreparedStatement preparedStatement = connection.prepareStatement(
-        "SELECT * FROM user WHERE id = ?"
+        "SELECT * FROM \"user\" WHERE id = ?"
     )) {
       preparedStatement.setObject(1, id);
       preparedStatement.execute();
@@ -57,11 +57,11 @@ public class AuthUserDaoJdbc implements AuthUserDao {
           AuthUserEntity authUserEntity = new AuthUserEntity();
           authUserEntity.setId(resultSet.getObject("id", UUID.class));
           authUserEntity.setUsername(resultSet.getString("username"));
-          authUserEntity.setUsername(resultSet.getString("password"));
-          authUserEntity.setUsername(resultSet.getString("enabled"));
-          authUserEntity.setUsername(resultSet.getString("account_non_expired"));
-          authUserEntity.setUsername(resultSet.getString("account_non_locked"));
-          authUserEntity.setUsername(resultSet.getString("credentials_non_expired"));
+          authUserEntity.setPassword(resultSet.getString("password"));
+          authUserEntity.setEnabled(resultSet.getBoolean("enabled"));
+          authUserEntity.setAccountNonExpired(resultSet.getBoolean("account_non_expired"));
+          authUserEntity.setAccountNonLocked(resultSet.getBoolean("account_non_locked"));
+          authUserEntity.setCredentialsNonExpired(resultSet.getBoolean("credentials_non_expired"));
           return Optional.of(authUserEntity);
         } else {
           return Optional.empty();
@@ -75,7 +75,7 @@ public class AuthUserDaoJdbc implements AuthUserDao {
   @Override
   public void delete(AuthUserEntity authUserEntity) {
     try (PreparedStatement preparedStatement = connection.prepareStatement(
-        "DELETE FROM user WHERE id = ?"
+        "DELETE FROM \"user\" WHERE id = ?"
     )) {
       preparedStatement.setObject(1, authUserEntity.getId());
       int numberEntitiesRemoved = preparedStatement.executeUpdate();

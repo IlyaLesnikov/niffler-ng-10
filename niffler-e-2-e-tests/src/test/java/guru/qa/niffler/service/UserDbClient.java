@@ -10,37 +10,56 @@ import guru.qa.niffler.data.impl.AuthAuthorityDaoJdbc;
 import guru.qa.niffler.data.impl.AuthUserDaoJdbc;
 import guru.qa.niffler.data.impl.UserDataDaoJdbc;
 import guru.qa.niffler.model.*;
+import guru.qa.niffler.util.RandomDataUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class UserDbClient {
   
   private final Config CONFIG = Config.getInstance();
 
-  public Object createUser(UserJson userJson, AuthUserJson authUserJson, TransactionIsolation transactionIsolation) {
+  public UserJson createUser(UserJson userJson) {
     return Databases.xaTransaction(
-        transactionIsolation,
-        new XaFunction<Object>(
+        new XaFunction<>(
             connection -> {
               UserEntity user = UserEntity.fromJson(userJson);
-              return new UserDataDaoJdbc(connection).create(user);
+              new UserDataDaoJdbc(connection).create(user);
+              return null;
             },
             CONFIG.userDataJdbcUrl()
         ),
         new XaFunction<>(
             connection -> {
-              AuthUserEntity authUserEntity = AuthUserEntity.fromJson(authUserJson);
+              AuthUserEntity authUserEntity = new AuthUserEntity();
+              authUserEntity.setUsername(userJson.username());
+              authUserEntity.setPassword(RandomDataUtils.password());
+              authUserEntity.setEnabled(true);
+              authUserEntity.setAccountNonExpired(true);
+              authUserEntity.setAccountNonLocked(true);
+              authUserEntity.setCredentialsNonExpired(true);
               AuthUserEntity createdAuthUserEntity = new AuthUserDaoJdbc(connection).create(authUserEntity);
-              List<AuthorityEntity> createdAuthorityEntities = new AuthAuthorityDaoJdbc(connection).create(
-                  AuthorityEntity.fromJson(
-                      new AuthorityJson(null, AuthUserJson.fromEntity(createdAuthUserEntity), Authority.read)
-                  ),
-                  AuthorityEntity.fromJson(
-                      new AuthorityJson(null, AuthUserJson.fromEntity(createdAuthUserEntity), Authority.write)
-                  )
+              AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values())
+                  .map(authority -> {
+                    AuthorityEntity authorityEntity = new AuthorityEntity();
+                    authorityEntity.setUserId(createdAuthUserEntity.getId());
+                    authorityEntity.setAuthority(authority);
+                    return authorityEntity;
+                  })
+                  .toArray(AuthorityEntity[]::new);
+              new AuthAuthorityDaoJdbc(connection).create(authorityEntities);
+              createdAuthUserEntity.setAuthorities(Arrays.stream(authorityEntities).toList());
+              return new UserJson(
+                  createdAuthUserEntity.getId(),
+                  userJson.username(),
+                  userJson.firstname(),
+                  userJson.surname(),
+                  userJson.fullname(),
+                  userJson.currency(),
+                  userJson.photo(),
+                  userJson.photoSmall()
               );
-              createdAuthUserEntity.setAuthorities(createdAuthorityEntities);
-              return createdAuthUserEntity;
             },
             CONFIG.authJdbcUrl()
         )
