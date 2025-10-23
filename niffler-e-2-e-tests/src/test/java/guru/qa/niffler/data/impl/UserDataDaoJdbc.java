@@ -1,7 +1,5 @@
 package guru.qa.niffler.data.impl;
 
-import guru.qa.niffler.config.Config;
-import guru.qa.niffler.data.Databases;
 import guru.qa.niffler.data.dao.UserDataDao;
 import guru.qa.niffler.data.entity.UserEntity;
 import guru.qa.niffler.model.CurrencyValues;
@@ -11,11 +9,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class UserDataDaoJdbc implements UserDataDao {
-  private static final Config CONFIG = Config.getInstance();
+  private final Connection connection;
 
+  public UserDataDaoJdbc(Connection connection) {
+    this.connection = connection;
+  }
   @Override
   public UserEntity create(UserEntity userEntity) {
-    try (Connection connection = Databases.connection(CONFIG.userDataJdbcUrl())) {
       try (PreparedStatement preparedStatement = connection.prepareStatement(
           "INSERT INTO user (username, currency, firstname, surname, fullname, photo, photoSmall) VALUES (?, ?, ?, ?, ?, ?, ?)",
           Statement.RETURN_GENERATED_KEYS
@@ -36,7 +36,6 @@ public class UserDataDaoJdbc implements UserDataDao {
           userEntity.setId(generatedKey);
           return userEntity;
         }
-      }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
@@ -44,7 +43,6 @@ public class UserDataDaoJdbc implements UserDataDao {
 
   @Override
   public Optional<UserEntity> findById(UUID id) {
-    try (Connection connection = Databases.connection(CONFIG.userDataJdbcUrl())) {
       try (PreparedStatement preparedStatement = connection.prepareStatement(
           "SELECT * FROM user WHERE id = ?"
       )) {
@@ -65,7 +63,6 @@ public class UserDataDaoJdbc implements UserDataDao {
             return Optional.empty();
           }
         }
-      }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
@@ -73,7 +70,6 @@ public class UserDataDaoJdbc implements UserDataDao {
 
   @Override
   public Optional<UserEntity> findByUsername(String username) {
-    try (Connection connection = Databases.connection(CONFIG.userDataJdbcUrl())) {
       try (PreparedStatement preparedStatement = connection.prepareStatement(
           "SELECT * FROM user WHERE username = ? LIMIT 1"
       )) {
@@ -93,7 +89,6 @@ public class UserDataDaoJdbc implements UserDataDao {
           } else {
             return Optional.empty();
           }
-        }
       }
     } catch (SQLException e) {
       throw new RuntimeException(e);
@@ -102,7 +97,6 @@ public class UserDataDaoJdbc implements UserDataDao {
 
   @Override
   public void delete(UserEntity user) {
-    try (Connection connection = Databases.connection(CONFIG.userDataJdbcUrl())) {
       try (PreparedStatement preparedStatement = connection.prepareStatement(
           "DELETE FROM user WHERE id = ?"
       )) {
@@ -111,7 +105,6 @@ public class UserDataDaoJdbc implements UserDataDao {
         if (numberEntitiesRemoved != 1) {
           throw new SQLException("Не удалось удалить пользователя с id = %s из таблицы user".formatted(user.getId()));
         }
-      }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
