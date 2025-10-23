@@ -24,7 +24,7 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
         Statement.RETURN_GENERATED_KEYS
     )) {
       for (AuthorityEntity authorityEntity: authorityEntities) {
-        preparedStatement.setObject(1, authorityEntity.getUser().getId());
+        preparedStatement.setObject(1, authorityEntity.getUserId());
         preparedStatement.setString(2, authorityEntity.getAuthority().name());
         preparedStatement.addBatch();
         preparedStatement.clearParameters();
