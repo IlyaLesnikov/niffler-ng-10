@@ -5,7 +5,6 @@ import guru.qa.niffler.data.entity.Authority;
 import guru.qa.niffler.data.entity.AuthorityEntity;
 
 import java.sql.*;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,7 +23,7 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
         Statement.RETURN_GENERATED_KEYS
     )) {
       for (AuthorityEntity authorityEntity: authorityEntities) {
-        preparedStatement.setObject(1, authorityEntity.getUser().getId());
+        preparedStatement.setObject(1, authorityEntity.getUserId());
         preparedStatement.setString(2, authorityEntity.getAuthority().name());
         preparedStatement.addBatch();
         preparedStatement.clearParameters();
@@ -36,7 +35,7 @@ public class AuthAuthorityDaoJdbc implements AuthAuthorityDao {
           authorityEntities[index].setId(generatedKeys);
         }
       }
-      return Arrays.stream(authorityEntities).toList();
+      return List.of(authorityEntities);
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
