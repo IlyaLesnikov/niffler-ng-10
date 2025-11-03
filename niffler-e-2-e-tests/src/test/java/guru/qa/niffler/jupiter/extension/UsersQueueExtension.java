@@ -55,7 +55,7 @@ public class UsersQueueExtension implements BeforeEachCallback, AfterEachCallbac
   @Override
   public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
     return parameterContext.getParameter().isAnnotationPresent(UserType.class) &&
-    parameterContext.getParameter().getType().isAssignableFrom(StaticUser.class);
+        parameterContext.getParameter().getType().isAssignableFrom(StaticUser.class);
   }
 
   @Override

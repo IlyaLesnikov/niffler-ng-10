@@ -1,6 +1,9 @@
 package guru.qa.niffler.util;
 
 import com.github.javafaker.Faker;
+import guru.qa.niffler.model.CurrencyValues;
+
+import java.util.Random;
 
 public class RandomDataUtils {
 
@@ -22,6 +25,20 @@ public class RandomDataUtils {
 
   public static String sentence(int wordsCount) {
     return faker.commerce().promotionCode(wordsCount);
+  }
+
+  public static String firstName() {
+    return faker.name().firstName();
+  }
+
+  public static String fullName() {
+    return faker.name().fullName();
+  }
+
+  public static CurrencyValues currencyValues() {
+    CurrencyValues[] currencyValues = CurrencyValues.values();
+    int randomIndex = new Random().nextInt(0, currencyValues.length);
+    return currencyValues[randomIndex];
   }
 
   public static String password() {
