@@ -17,7 +17,7 @@ public class UserDataDaoJdbc implements UserDataDao {
   @Override
   public UserEntity create(UserEntity userEntity) {
       try (PreparedStatement preparedStatement = connection.prepareStatement(
-          "INSERT INTO user (username, currency, firstname, surname, fullname, photo, photoSmall) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          "INSERT INTO \"user\" (username, currency, firstname, surname, full_name, photo, photo_small) VALUES (?, ?, ?, ?, ?, ?, ?)",
           Statement.RETURN_GENERATED_KEYS
       )) {
         preparedStatement.setString(1, userEntity.getUsername());
@@ -44,7 +44,7 @@ public class UserDataDaoJdbc implements UserDataDao {
   @Override
   public Optional<UserEntity> findById(UUID id) {
       try (PreparedStatement preparedStatement = connection.prepareStatement(
-          "SELECT * FROM user WHERE id = ?"
+          "SELECT * FROM \"user\" WHERE id = ?"
       )) {
         preparedStatement.setObject(1, id);
         preparedStatement.execute();
@@ -71,7 +71,7 @@ public class UserDataDaoJdbc implements UserDataDao {
   @Override
   public Optional<UserEntity> findByUsername(String username) {
       try (PreparedStatement preparedStatement = connection.prepareStatement(
-          "SELECT * FROM user WHERE username = ? LIMIT 1"
+          "SELECT * FROM \"user\" WHERE username = ? LIMIT 1"
       )) {
         preparedStatement.setObject(1, username);
         preparedStatement.execute();
@@ -82,7 +82,7 @@ public class UserDataDaoJdbc implements UserDataDao {
             userEntity.setCurrency(resultSet.getObject("currency", CurrencyValues.class));
             userEntity.setFirstname(resultSet.getString("firstname"));
             userEntity.setSurname(resultSet.getString("surname"));
-            userEntity.setFullname(resultSet.getString("fullname"));
+            userEntity.setFullname(resultSet.getString("full_name"));
             userEntity.setPhoto(resultSet.getBytes("photo"));
             userEntity.setPhotoSmall(resultSet.getBytes("photo_small"));
             return Optional.of(userEntity);
@@ -98,7 +98,7 @@ public class UserDataDaoJdbc implements UserDataDao {
   @Override
   public void delete(UserEntity user) {
       try (PreparedStatement preparedStatement = connection.prepareStatement(
-          "DELETE FROM user WHERE id = ?"
+          "DELETE FROM \"user\" WHERE id = ?"
       )) {
         preparedStatement.setObject(1, user.getId());
         int numberEntitiesRemoved = preparedStatement.executeUpdate();

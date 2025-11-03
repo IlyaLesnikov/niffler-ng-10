@@ -25,8 +25,12 @@ public class Databases {
 
   private static final Map<String, DataSource> datasource = new ConcurrentHashMap<>();
   private static final Map<Long, Map<String, Connection>> threadConnections = new ConcurrentHashMap<>();
-  
-  public static <T> T xaTransaction(TransactionIsolation transactionIsolation, XaFunction<T>... actions) {
+
+  public static <T> T xaTransaction(XaFunction<T>... actions) {
+    return xaTransaction(TransactionIsolation.TRANSACTION_READ_COMMITTED, actions);
+  }
+
+    public static <T> T xaTransaction(TransactionIsolation transactionIsolation, XaFunction<T>... actions) {
     UserTransaction userTransaction = new UserTransactionImp();
     try {
       userTransaction.begin();
@@ -48,7 +52,11 @@ public class Databases {
     }
   }
 
-  public static void xaTransaction(TransactionIsolation transactionIsolation, XaConsumer... actions) {
+  public static void xaTransaction(XaConsumer... actions) {
+    xaTransaction(TransactionIsolation.TRANSACTION_READ_COMMITTED, actions);
+  }
+
+    public static void xaTransaction(TransactionIsolation transactionIsolation, XaConsumer... actions) {
     UserTransaction userTransaction = new UserTransactionImp();
     try {
       userTransaction.begin();
@@ -68,7 +76,11 @@ public class Databases {
     }
   }
 
-  public static <T> T transaction(Function<Connection, T> function, String jdbcUrl, TransactionIsolation transactionIsolation) {
+  public static <T> T transaction(Function<Connection, T> function, String jdbcUrl) {
+    return transaction(function, jdbcUrl, TransactionIsolation.TRANSACTION_READ_COMMITTED);
+  }
+
+    public static <T> T transaction(Function<Connection, T> function, String jdbcUrl, TransactionIsolation transactionIsolation) {
     Connection connection = null;
     try {
       connection = connection(jdbcUrl);
@@ -91,7 +103,11 @@ public class Databases {
     }
   }
 
-  public static void transaction(Consumer<Connection> consumer, String jdbcUrl, TransactionIsolation transactionIsolation) {
+  public static void transaction(Consumer<Connection> consumer, String jdbcUrl) {
+    transaction(consumer, jdbcUrl, TransactionIsolation.TRANSACTION_READ_COMMITTED);
+  }
+
+    public static void transaction(Consumer<Connection> consumer, String jdbcUrl, TransactionIsolation transactionIsolation) {
     Connection connection = null;
     try {
       connection = connection(jdbcUrl);
